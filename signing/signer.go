@@ -2,12 +2,11 @@ package signing
 
 import (
 	"bytes"
-	"crypto/ed25519"
 	"errors"
 	"fmt"
 	"io"
 
-	oasis "github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
+	"github.com/oasisprotocol/curve25519-voi/primitives/ed25519"
 
 	"github.com/spacemeshos/go-spacemesh/common/types"
 )
@@ -153,7 +152,7 @@ func (es *EdSigner) PrivateKey() PrivateKey {
 // VRFSigner wraps same ed25519 key to provide ecvrf.
 func (es *EdSigner) VRFSigner() *VRFSigner {
 	return &VRFSigner{
-		privateKey: oasis.PrivateKey(es.priv),
+		privateKey: ed25519.PrivateKey(es.priv),
 		nodeID:     es.NodeID(),
 	}
 }
