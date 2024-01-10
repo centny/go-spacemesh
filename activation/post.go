@@ -87,6 +87,7 @@ type PostSetupOpts struct {
 	Throttle         bool                `mapstructure:"smeshing-opts-throttle"`
 	Scrypt           config.ScryptParams `mapstructure:"smeshing-opts-scrypt"`
 	ComputeBatchSize uint64              `mapstructure:"smeshing-opts-compute-batch-size"`
+	CoinbaseAccount  string              `mapstructure:"smeshing-coinbase"`
 }
 
 type PostProviderID struct {

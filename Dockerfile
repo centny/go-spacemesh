@@ -12,7 +12,7 @@ RUN set -ex \
    tzdata \
    locales \
    procps \
-   net-tools \
+   net-tools iproute2 iputils-ping telnet\
    file \
    ocl-icd-libopencl1 clinfo \
    # required for OpenCL CPU provider
@@ -22,6 +22,10 @@ RUN set -ex \
    && locale-gen en_US.UTF-8 \
    && update-locale LANG=en_US.UTF-8 \
    && echo "$TZ" > /etc/timezone
+RUN mkdir -p /etc/OpenCL/vendors && \
+    echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8

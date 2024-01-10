@@ -10,6 +10,7 @@ type Config struct {
 	PublicListener  string    `mapstructure:"grpc-public-listener"`
 	PrivateServices []Service `mapstructure:"grpc-private-services"`
 	PrivateListener string    `mapstructure:"grpc-private-listener"`
+	GroupListener   []string  `mapstructure:"grpc-group-listener"`
 	GrpcSendMsgSize int       `mapstructure:"grpc-send-msg-size"`
 	GrpcRecvMsgSize int       `mapstructure:"grpc-recv-msg-size"`
 	JSONListener    string    `mapstructure:"grpc-json-listener"`

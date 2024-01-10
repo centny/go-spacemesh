@@ -324,6 +324,7 @@ type App struct {
 	dbMetrics          *dbmetrics.DBMetricsCollector
 	grpcPublicService  *grpcserver.Server
 	grpcPrivateService *grpcserver.Server
+	grpcGroupService   []*grpcserver.Server
 	jsonAPIService     *grpcserver.JSONHTTPServer
 	pprofService       *http.Server
 	profilerService    *pyroscope.Profiler
@@ -340,6 +341,8 @@ type App struct {
 	certifier          *blocks.Certifier
 	postSetupMgr       *activation.PostSetupManager
 	atxBuilder         *activation.Builder
+	postSetupGroup     []*activation.PostSetupManager
+	atxBuilderGroup    []*activation.Builder
 	atxHandler         *activation.Handler
 	txHandler          *txs.TxHandler
 	validator          *activation.Validator
@@ -920,6 +923,8 @@ func (app *App) initServices(ctx context.Context) error {
 		activation.WithValidator(app.validator),
 	)
 
+	app.initSmeshingGroup(ctx, lg, goldenATXID, poetDb, layersPerEpoch, newSyncer)
+
 	malfeasanceHandler := malfeasance.NewHandler(
 		app.cachedDB,
 		app.addLogger(MalfeasanceLogger, lg),
@@ -1316,6 +1321,9 @@ func (app *App) startAPIServices(ctx context.Context) error {
 		if err := app.grpcPrivateService.Start(); err != nil {
 			return err
 		}
+	}
+	if err := app.startAPIServicesGroup(ctx, logger); err != nil {
+		return err
 	}
 	return nil
 }
