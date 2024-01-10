@@ -324,7 +324,7 @@ type App struct {
 	dbMetrics          *dbmetrics.DBMetricsCollector
 	grpcPublicService  *grpcserver.Server
 	grpcPrivateService *grpcserver.Server
-	grpcGroupService   []*grpcserver.Server
+	grpcGroupService   map[string]*grpcserver.Server
 	jsonAPIService     *grpcserver.JSONHTTPServer
 	pprofService       *http.Server
 	profilerService    *pyroscope.Profiler
@@ -341,8 +341,8 @@ type App struct {
 	certifier          *blocks.Certifier
 	postSetupMgr       *activation.PostSetupManager
 	atxBuilder         *activation.Builder
-	postSetupGroup     []*activation.PostSetupManager
-	atxBuilderGroup    []*activation.Builder
+	postSetupGroup     map[string]*activation.PostSetupManager
+	atxBuilderGroup    map[string]*activation.Builder
 	atxHandler         *activation.Handler
 	txHandler          *txs.TxHandler
 	validator          *activation.Validator
@@ -1179,6 +1179,8 @@ func (app *App) startServices(ctx context.Context) error {
 		app.log.Info("smeshing not started, waiting to be triggered via smesher api")
 	}
 
+	app.startServicesGroup()
+
 	if app.ptimesync != nil {
 		app.ptimesync.Start()
 	}
@@ -1362,6 +1364,8 @@ func (app *App) stopServices(ctx context.Context) {
 	if app.atxBuilder != nil {
 		_ = app.atxBuilder.StopSmeshing(false)
 	}
+
+	app.stopServicesGroup()
 
 	if app.postVerifier != nil {
 		app.postVerifier.Close()

@@ -6,14 +6,14 @@ import (
 )
 
 type Config struct {
-	PublicServices  []Service `mapstructure:"grpc-public-services"`
-	PublicListener  string    `mapstructure:"grpc-public-listener"`
-	PrivateServices []Service `mapstructure:"grpc-private-services"`
-	PrivateListener string    `mapstructure:"grpc-private-listener"`
-	GroupListener   []string  `mapstructure:"grpc-group-listener"`
-	GrpcSendMsgSize int       `mapstructure:"grpc-send-msg-size"`
-	GrpcRecvMsgSize int       `mapstructure:"grpc-recv-msg-size"`
-	JSONListener    string    `mapstructure:"grpc-json-listener"`
+	PublicServices  []Service         `mapstructure:"grpc-public-services"`
+	PublicListener  string            `mapstructure:"grpc-public-listener"`
+	PrivateServices []Service         `mapstructure:"grpc-private-services"`
+	PrivateListener string            `mapstructure:"grpc-private-listener"`
+	GroupListener   map[string]string `mapstructure:"grpc-group-listener"`
+	GrpcSendMsgSize int               `mapstructure:"grpc-send-msg-size"`
+	GrpcRecvMsgSize int               `mapstructure:"grpc-recv-msg-size"`
+	JSONListener    string            `mapstructure:"grpc-json-listener"`
 
 	SmesherStreamInterval time.Duration
 }

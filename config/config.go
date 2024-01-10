@@ -136,12 +136,12 @@ type PublicMetrics struct {
 
 // SmeshingConfig defines configuration for the node's smeshing (mining).
 type SmeshingConfig struct {
-	Start           bool                              `mapstructure:"smeshing-start"`
-	CoinbaseAccount string                            `mapstructure:"smeshing-coinbase"`
-	Opts            activation.PostSetupOpts          `mapstructure:"smeshing-opts"`
-	OptsGroup       []activation.PostSetupOpts        `mapstructure:"smeshing-group"`
-	ProvingOpts     activation.PostProvingOpts        `mapstructure:"smeshing-proving-opts"`
-	VerifyingOpts   activation.PostProofVerifyingOpts `mapstructure:"smeshing-verifying-opts"`
+	Start           bool                                `mapstructure:"smeshing-start"`
+	CoinbaseAccount string                              `mapstructure:"smeshing-coinbase"`
+	Opts            activation.PostSetupOpts            `mapstructure:"smeshing-opts"`
+	OptsGroup       map[string]activation.PostSetupOpts `mapstructure:"smeshing-group"`
+	ProvingOpts     activation.PostProvingOpts          `mapstructure:"smeshing-proving-opts"`
+	VerifyingOpts   activation.PostProofVerifyingOpts   `mapstructure:"smeshing-verifying-opts"`
 }
 
 // DefaultConfig returns the default configuration for a spacemesh node.

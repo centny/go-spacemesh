@@ -12,7 +12,13 @@ import (
 )
 
 func (app *App) initSmeshingGroup(ctx context.Context, lg log.Log, goldenATXID types.ATXID, poetDb *activation.PoetDb, layersPerEpoch uint32, newSyncer *syncer.Syncer) {
+	app.postSetupGroup = map[string]*activation.PostSetupManager{}
+	app.atxBuilderGroup = map[string]*activation.Builder{}
 	for i, opts := range app.Config.SMESHING.OptsGroup {
+		defaultOpts := activation.DefaultPostSetupOpts()
+		opts.Throttle = defaultOpts.Throttle
+		opts.Scrypt = defaultOpts.Scrypt
+		opts.ComputeBatchSize = defaultOpts.ComputeBatchSize
 		postSetupMgr, err := activation.NewPostSetupManager(
 			app.edSgn.NodeID(),
 			app.Config.POST,
@@ -71,13 +77,17 @@ func (app *App) initSmeshingGroup(ctx context.Context, lg log.Log, goldenATXID t
 			activation.WithValidator(app.validator),
 		)
 
-		app.postSetupGroup = append(app.postSetupGroup, postSetupMgr)
-		app.atxBuilderGroup = append(app.atxBuilderGroup, atxBuilder)
+		app.postSetupGroup[i] = postSetupMgr
+		app.atxBuilderGroup[i] = atxBuilder
 	}
 }
 
-func (app *App) startServiceGroup() {
+func (app *App) startServicesGroup() {
 	for i, opts := range app.Config.SMESHING.OptsGroup {
+		defaultOpts := activation.DefaultPostSetupOpts()
+		opts.Throttle = defaultOpts.Throttle
+		opts.Scrypt = defaultOpts.Scrypt
+		opts.ComputeBatchSize = defaultOpts.ComputeBatchSize
 		coinbaseAddr, err := types.StringToAddress(opts.CoinbaseAccount)
 		if err != nil {
 			app.log.Panic(
@@ -86,21 +96,26 @@ func (app *App) startServiceGroup() {
 				err,
 			)
 		}
-		if err := app.atxBuilderGroup[i].StartSmeshing(coinbaseAddr, app.Config.SMESHING.Opts); err != nil {
+		if err := app.atxBuilderGroup[i].StartSmeshing(coinbaseAddr, opts); err != nil {
 			app.log.Panic("failed to start smeshing: %v", err)
 		}
 	}
 }
 
-func (app *App) stopServiceGroup() {
+func (app *App) stopServicesGroup() {
 	for _, atxBuilder := range app.atxBuilderGroup {
 		_ = atxBuilder.StopSmeshing(false)
 	}
 }
 
 func (app *App) startAPIServicesGroup(ctx context.Context, logger log.Log) error {
+	app.grpcGroupService = map[string]*grpcserver.Server{}
 	for i, opts := range app.Config.SMESHING.OptsGroup {
-		app.grpcGroupService = append(app.grpcGroupService, app.newGrpc(logger, app.Config.API.GroupListener[i]))
+		defaultOpts := activation.DefaultPostSetupOpts()
+		opts.Throttle = defaultOpts.Throttle
+		opts.Scrypt = defaultOpts.Scrypt
+		opts.ComputeBatchSize = defaultOpts.ComputeBatchSize
+		app.grpcGroupService[i] = app.newGrpc(logger, app.Config.API.GroupListener[i])
 		gsvc := grpcserver.NewSmesherService(
 			app.postSetupGroup[i],
 			app.atxBuilderGroup[i],
